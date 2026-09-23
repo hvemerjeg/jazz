@@ -22,7 +22,7 @@ def menu():
 
 def findAccidental(note:str, key:str):
     if key in BASE_MAJOR_KEYS:
-        if not key == "CMaj":
+        if key == "FMaj" and note == "B":
             return "B" + "b"
         return note
     # implement logic for minor
@@ -49,14 +49,9 @@ def findProgression(key:str, progression:str):
     if key not in MAJOR_KEYS and key not in BASE_MAJOR_KEYS:
         raise ValueError("Key was not found")
     if progression == "Maj_II-V-I":
-        if key in BASE_MAJOR_KEYS:
-            ii = NOTES[(NOTES.index(note) + 1) % len(NOTES)] + "min7"
-            v = NOTES[(NOTES.index(note) + 4) % len(NOTES)] + "7"
-            i = key + "7"
-        else:
-            ii = findAccidental(NOTES[(NOTES.index(note) + 1) % len(NOTES)], key) + "min7"
-            v = findAccidental(NOTES[(NOTES.index(note) + 4) % len(NOTES)], key) + "7"
-            i = key + "7"
+        ii = findAccidental(NOTES[(NOTES.index(note) + 1) % len(NOTES)], key) + "min7"
+        v = findAccidental(NOTES[(NOTES.index(note) + 4) % len(NOTES)], key) + "7"
+        i = key + "7"
     return [ii, v, i]
 
 def Maj_II_V_I():
