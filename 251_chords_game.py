@@ -19,6 +19,7 @@ def menu():
     print("2) Minor")
     print("3) Both")
     print("4) Random chord in major keys (only II-V-I)")
+    print("5) Major with three note voicing")
 
 def findAccidental(note:str, key:str):
     if key in BASE_MAJOR_KEYS:
@@ -44,7 +45,7 @@ def findAccidental(note:str, key:str):
     return note
 
 def findProgression(key:str, progression:str):
-    altered_note = key.replace("Maj", "").replace("min", "") # Note with alteration (in case that it has). Add half dimished #FIXME
+    altered_note = key.replace("Maj", "").replace("min", "") # note with alteration (in case that it has). add half dimished #fixme
     note = altered_note.replace("#", "").replace("b", "")
     if key not in MAJOR_KEYS and key not in BASE_MAJOR_KEYS:
         raise ValueError("Key was not found")
@@ -54,23 +55,40 @@ def findProgression(key:str, progression:str):
         i = key + "7"
     return [ii, v, i]
 
-def Maj_II_V_I():
+def threeNoteVoicing(chord:str, key:str):
+    altered_note = chord.replace("Maj7", "").replace("min7", "").replace("7", "")
+    note = altered_note.replace("#", "").replace("b", "")
+    root = altered_note
+    third = findAccidental(NOTES[(NOTES.index(note) + 2) % len(NOTES)], key)
+    seventh = findAccidental(NOTES[(NOTES.index(note) + 6) % len(NOTES)], key)
+    return [root, third, seventh]
+
+def Maj_II_V_I(voicing=None):
     os.system('cls' if os.name == 'nt' else 'clear')
     current = choice(MAJOR_KEYS)
     print(f"Play II-V-I in the key of {current} on your instrument")
-    chords_input = input(f"Insert II-V-I chords of {current} (e.g. F#min7, B7, EMaj7): ").split(", ")
+    #chords_input = input(f"Insert II-V-I chords of {current} (e.g. F#min7, B7, EMaj7): ").split(", ")
     current_progression = findProgression(current, "Maj_II-V-I")
-    for r, a in zip(chords_input, current_progression):
-        if r != a:
-            print(f"Incorrect response {r}. The correct answer is {a}")
+    for indx, degree in enumerate(["II", "V", "I"]):
+        chord_input = input(f"Insert {degree} chord of {current} (e.g. F#min7): ")
+        if chord_input != current_progression[indx]:
+            print(f"Incorrect response {chord_input}. The correct answer is {current_progression[indx]}")
         else:
-            print(f"{r} is correct!")
-    print(f"The correct answer is {', '.join(current_progression)}")
+            print(f"{chord_input} is correct!")
+
+        if voicing == "three_note":
+            notes = threeNoteVoicing(current_progression[indx], current)
+            note_input = input(f"Insert notes of voicing {voicing} for chord {current_progression[indx]} (e.g. C, E, B): ").split(", ")
+            if note_input != notes:
+                print(f"Incorrect response {note_input}. The correct answer is {notes}")
+            else:
+                print(f"{note_input} is correct!")
+
     MAJOR_KEYS.remove(current)
     input("Press enter")
 
 
-def Min_II_V_I(infinite=False):
+def Min_II_V_I():
     raise NotImplementedError
 
 def randomChord(progression:str):
@@ -87,7 +105,7 @@ def randomChord(progression:str):
 
 def main():
     menu()
-    game_mode = input("Which mode do you want to play (1, 2, 3, or 4): ")
+    game_mode = input("Which mode do you want to play (1, 2, 3, 4 or 5): ")
     if game_mode == "1":
         while len(MAJOR_KEYS):
             Maj_II_V_I()
@@ -97,6 +115,9 @@ def main():
         pass
     elif game_mode == "4":
         randomChord("Maj_II-V-I")
+    elif game_mode == "5":
+        while len(MAJOR_KEYS):
+            Maj_II_V_I("three_note")
 
 if __name__ == "__main__":
     main()
